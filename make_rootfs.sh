@@ -99,19 +99,10 @@ pacman-key --populate archlinuxarm
 killall -KILL gpg-agent
 pacman -Sy --noconfirm
 pacman -Rsn --noconfirm linux-aarch64
-pacman -S --noconfirm --needed dosfstools curl xz iw rfkill netctl dialog wpa_supplicant alsa-utils \
-	pv linux-pine64 linux-pine64-headers networkmanager dkms-rtl8723cs uboot-pine64-git \
+pacman -S --noconfirm --needed dosfstools curl xz iw rfkill netctl dialog \
+	pv linux-pine64 linux-pine64-headers dkms-rtl8723cs uboot-pine64-git \
 	rtl8723bt-firmware
 
-# Install XFCE
-pacman -S --noconfirm xfce4 xorg-server xf86-input-libinput lxdm ttf-dejavu ttf-liberation firefox  \
-      		pulseaudio nm-connection-editor network-manager-applet \
-      		xfce4-pulseaudio-plugin \
-		blueman pulseaudio-bluetooth \
-      		pulseaudio-alsa pavucontrol
-systemctl enable lxdm
-systemctl enable NetworkManager
-systemctl enable bluetooth
 usermod -a -G network,video,audio,optical,storage,input,scanner,games,lp,rfkill alarm
 
 sed -i 's|^#en_US.UTF-8|en_US.UTF-8|' /etc/locale.gen
