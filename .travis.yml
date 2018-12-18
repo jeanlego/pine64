@@ -1,13 +1,14 @@
+dist: trusty
 sudo: required
-services:
-  - docker
-language: bash
+addons:
+  apt:
+    packages:
+    - qemu
+    - qemu-user-static
+    - binfmt-support
+    - parted
+    - wget
+    - dosfstools
+    - zip
 script:
-  - ./travis-build.sh
-after_success:
-  - ls -al builds/$BUILD_NR/*
-branches:
-  only:
-    - master
-  except:
-    - /^v\d.*$/
+- sudo make
