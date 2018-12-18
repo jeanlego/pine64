@@ -1,12 +1,21 @@
 #/bin/bash
+LIBARCHIVE_V=3.3.3
+LIBARCHIVE=https://www.libarchive.org/downloads/libarchive-${LIBARCHIVE_V}.tar.gz
 
-wget https://www.libarchive.org/downloads/libarchive-3.3.1.tar.gz
-tar xzf libarchive-3.3.1.tar.gz
-cd libarchive-3.3.1
+SCRIPT_ROOT_DIR=${PWD}
+
+cd ${SCRIPT_ROOT_DIR}
+######
+# build libarchive (bsdtar)
+mkdir -p libarchive
+curl -s ${LIBARCHIVE} | tar xvf - -C libarchive/
+cd libarchive
 ./build/autogen.sh
 ./configure
-make
-sudo make install
+make -j2
+make install
 
-cd ..
+cd ${SCRIPT_ROOT_DIR}
+#######
+# build the image
 make
