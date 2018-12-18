@@ -10,6 +10,5 @@ addons:
     - wget
     - dosfstools
     - zip
-    - bsdtar
 script:
-- sudo /bin/bash -c 'make'
+- sudo ./build_on_travis.sh
