@@ -10,5 +10,6 @@ addons:
     - wget
     - dosfstools
     - zip
+    - bsdtar
 script:
-- sudo make
+- sudo /bin/bash -c 'make'
