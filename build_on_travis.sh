@@ -14,6 +14,7 @@ cd libarchive
 ./configure
 make -j2
 make install
+export PATH=${PATH}:${PWD}
 
 cd ${SCRIPT_ROOT_DIR}
 #######
