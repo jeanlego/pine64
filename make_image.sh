@@ -5,17 +5,9 @@ set -x
 export LC_ALL=C
 
 IMAGE_NAME=archlinux-sopine-headless.img
-BOOTLOADER=u-boot-sunxi-with-spl-sopine.bin
 
 DEST=$(mktemp -d)
 mkdir -p $DEST
-
-ROOTFS_FILENAME=ArchLinuxARM-aarch64-latest.tar.gz
-ROOTFS="http://archlinuxarm.org/os/${ROOTFS_FILENAME}"
-
-echo "Attaching loop device"
-LOOP_DEVICE=$(losetup -f)
-losetup -P $LOOP_DEVICE $IMAGE_NAME
 
 cleanup() {
 
@@ -30,6 +22,9 @@ cleanup() {
 	# Detach loop device
 	losetup -d $LOOP_DEVICE || /bin/true
 }
+
+ROOTFS_FILENAME=ArchLinuxARM-aarch64-latest.tar.gz
+ROOTFS="http://archlinuxarm.org/os/${ROOTFS_FILENAME}"
 
 do_chroot() {
 	cmd="$@"
@@ -50,7 +45,7 @@ if [ "$(id -u)" -ne "0" ]; then
 fi
 
 echo "Downloading rootfs tarball ..."
-#wget ${ROOTFS}
+wget ${ROOTFS}
 
 # make the empty image
 IMAGE_SIZE=6144M
@@ -89,8 +84,9 @@ a
 3
 w
 EOF
-
-echo "Done empty image"
+echo "Attaching loop device"
+LOOP_DEVICE=$(losetup -f)
+losetup -P $LOOP_DEVICE $IMAGE_NAME
 
 echo "Creating filesystems"
 mkfs.vfat ${LOOP_DEVICE}p1
