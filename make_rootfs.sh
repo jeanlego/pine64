@@ -100,8 +100,7 @@ killall -KILL gpg-agent
 pacman -Sy --noconfirm
 pacman -Rsn --noconfirm linux-aarch64
 pacman -S --noconfirm --needed dosfstools curl xz iw rfkill netctl dialog \
-	pv linux-pine64 linux-pine64-headers dkms-rtl8723cs uboot-pine64-git \
-	rtl8723bt-firmware
+	pv linux-pine64 linux-pine64-headers uboot-pine64-git
 
 usermod -a -G network,video,audio,optical,storage,input,scanner,games,lp,rfkill alarm
 
