@@ -124,7 +124,7 @@ rm -f "$DEST"/*.core
 mv "$DEST/etc/resolv.conf.dist" "$DEST/etc/resolv.conf"
 
 cp $OTHERDIR/resize_rootfs.sh $DEST/usr/local/sbin/
-cp $OTHERDIR/sysrq.conf $DEST/etc/sysctl.d/
+echo "kernel.sysrq = 0" > $DEST/etc/sysctl.d/
 
 echo "Installed rootfs to $DEST"
 
