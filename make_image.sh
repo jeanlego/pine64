@@ -1,50 +1,34 @@
 #!/bin/bash
 trap cleanup EXIT
-
 set -e
 set -x
 export LC_ALL=C
 
-IMAGE_NAME="$1"
-BOOTLOADER="$2"
-
-if [ -z "$IMAGE_NAME" ] || [ -z "$BOOTLOADER" ]; then
-	echo "Usage: $0 <image name> <bootloader>"
-	exit 1
-fi
-
-if [ "$(id -u)" -ne "0" ]; then
-	echo "This script requires root."
-	exit 1
-fi
-
-BUILD="build"
-BUILD_ARCH=arm64
+IMAGE_NAME=archlinux-sopine-headless.img
+BOOTLOADER=u-boot-sunxi-with-spl-sopine.bin
 
 DEST=$(mktemp -d)
 mkdir -p $DEST
 
-ROOTFS="http://archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+ROOTFS_FILENAME=ArchLinuxARM-aarch64-latest.tar.gz
+ROOTFS="http://archlinuxarm.org/os/${ROOTFS_FILENAME}"
 
-mkdir -p $BUILD
-TARBALL="$BUILD/$(basename $ROOTFS)"
-if [ ! -e "$TARBALL" ]; then
-	echo "Downloading rootfs tarball ..."
-	wget -O "$TARBALL" "$ROOTFS"
-fi
+echo "Attaching loop device"
+LOOP_DEVICE=$(losetup -f)
+losetup -P $LOOP_DEVICE $IMAGE_NAME
 
 cleanup() {
-	if [ -e "$DEST/proc/cmdline" ]; then
-		umount "$DEST/proc"
-	fi
-	if [ -d "$DEST/sys/kernel" ]; then
-		umount "$DEST/sys"
-	fi
-	umount "$DEST/dev" || true
-	umount "$DEST/tmp" || true
-	if [ -d "$TEMP" ]; then
-		rm -rf "$TEMP"
-	fi
+
+	umount "$DEST/proc" || /bin/true
+	umount "$DEST/sys" || /bin/true
+	umount "$DEST/dev" || /bin/true
+	umount "$DEST/tmp" || /bin/true
+	umount $DEST || /bin/true
+
+	echo "Unmounting rootfs"
+	rm -rf $DEST || /bin/true
+	# Detach loop device
+	losetup -d $LOOP_DEVICE || /bin/true
 }
 
 do_chroot() {
@@ -59,6 +43,14 @@ do_chroot() {
 	umount "$DEST/dev"
 	umount "$DEST/tmp"
 }
+
+if [ "$(id -u)" -ne "0" ]; then
+	echo "This script requires root."
+	exit 1
+fi
+
+echo "Downloading rootfs tarball ..."
+#wget ${ROOTFS}
 
 # make the empty image
 IMAGE_SIZE=6144M
@@ -100,22 +92,17 @@ EOF
 
 echo "Done empty image"
 
-echo "Attaching loop device"
-LOOP_DEVICE=$(losetup -f)
-losetup -P $LOOP_DEVICE $IMAGE_NAME
-
 echo "Creating filesystems"
 mkfs.vfat ${LOOP_DEVICE}p1
 mkswap ${LOOP_DEVICE}p2
-mkfs.ext4 ${LOOP_DEVICE}p3
+mkfs.ext4 -F ${LOOP_DEVICE}p3
 
 echo "Mounting rootfs"
 mount ${LOOP_DEVICE}p3 $DEST
 
 # Extract with BSD tar
 echo -n "Extracting ... "
-set -x
-bsdtar -xpf "$TARBALL" -C "$DEST"
+bsdtar -xpf ${ROOTFS_FILENAME} -C ${DEST}
 echo "OK"
 
 # Add qemu emulation.
@@ -124,11 +111,12 @@ cp /usr/bin/qemu-arm-static "$DEST/usr/bin"
 
 mv "$DEST/etc/resolv.conf" "$DEST/etc/resolv.conf.dist"
 cp /etc/resolv.conf "$DEST/etc/resolv.conf"
+
 sed -i 's|CheckSpace|#CheckSpace|' "$DEST/etc/pacman.conf"
 
 cat >> "$DEST/etc/pacman.conf" <<EOF
 [pine64-mainline]
-SigLevel = Never
+SigLevel = Optional TrustAll
 Server = https://github.com/anarsoul/PKGBUILDs/releases/download/mainline/
 EOF
 
@@ -139,6 +127,7 @@ pacman-key --populate archlinuxarm
 killall -KILL gpg-agent
 pacman -Sy --noconfirm
 pacman -Rsn --noconfirm linux-aarch64
+pacman -S --noconfirm --needed git
 pacman -S --noconfirm --needed dosfstools curl xz iw rfkill netctl dialog \
 	pv linux-pine64 linux-pine64-headers uboot-pine64-git
 
@@ -159,8 +148,6 @@ do_chroot /second-phase
 rm $DEST/second-phase
 
 # Final touches
-rm "$DEST/usr/bin/qemu-aarch64-static"
-rm "$DEST/usr/bin/qemu-arm-static"
 rm -f "$DEST"/*.core
 mv "$DEST/etc/resolv.conf.dist" "$DEST/etc/resolv.conf"
 
@@ -168,12 +155,9 @@ cp resize_rootfs.sh $DEST/usr/local/sbin/
 echo "kernel.sysrq = 0" > $DEST/etc/sysctl.d/sysrq.conf
 
 echo "Installing bootloader"
-dd if=$DEST/boot/$BOOTLOADER of=${LOOP_DEVICE} bs=8k seek=1
+dd if="$DEST/boot/u-boot-sunxi-with-spl-sopine.bin" of="${LOOP_DEVICE}" bs=8k seek=1
 
-echo "Unmounting rootfs"
-umount $DEST
-rm -rf $DEST
 
-# Detach loop device
-losetup -d $LOOP_DEVICE
+
+
 

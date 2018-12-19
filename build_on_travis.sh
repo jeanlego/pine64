@@ -21,4 +21,4 @@ cd ${SCRIPT_ROOT_DIR}
 #######
 # build the image
 
-./make_image.sh archlinux-sopine-headless.img u-boot-sunxi-with-spl-sopine.bin
+./make_image.sh
