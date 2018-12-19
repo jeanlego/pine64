@@ -20,8 +20,5 @@ export PATH=${PATH}:${SCRIPT_ROOT_DIR}/${LIBARCHIVE_FILE}
 cd ${SCRIPT_ROOT_DIR}
 #######
 # build the image
-./make_rootfs.sh rootfs-release rootfs-release.tar.gz
 
-./make_empty_image.sh archlinux-sopine-headless.img
-
-./make_image.sh archlinux-sopine-headless.img rootfs-release.tar.gz u-boot-sunxi-with-spl-sopine.bin
+./make_image.sh archlinux-sopine-headless.img u-boot-sunxi-with-spl-sopine.bin
