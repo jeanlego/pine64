@@ -125,10 +125,6 @@ mv "$DEST/etc/resolv.conf.dist" "$DEST/etc/resolv.conf"
 
 cp $OTHERDIR/resize_rootfs.sh $DEST/usr/local/sbin/
 cp $OTHERDIR/sysrq.conf $DEST/etc/sysctl.d/
-# Probing gdk pixbuf modules fails on qemu with:
-# (process:30790): GLib-ERROR **: 20:53:40.468: getauxval () failed: No such file or directory
-# qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-cp $OTHERDIR/loaders.cache $DEST//usr/lib/gdk-pixbuf-2.0/2.10.0/
 
 echo "Installed rootfs to $DEST"
 
