@@ -119,7 +119,7 @@ $(cat ${TEMP_ROOT}/home/casaadmin/.zshrc)\
 umount ${TEMP_ROOT}
 
 echo "Installing bootloader"
-dd if=u-boot-sunxi-with-spl-sopine.bin of=${LOOP_DEVICE} bs=8k seek=1
+dd if=extras/u-boot-sunxi-with-spl-sopine.bin of=${LOOP_DEVICE} bs=8k seek=1
 
 losetup -d $LOOP_DEVICE
 rm -Rf ${TEMP_ROOT}
