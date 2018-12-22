@@ -1,4 +1,5 @@
 #!/bin/bash
+ROOT_DIR=${PWD}
 
 # ensure running as root
 if [ "$(id -u)" != "0" ]; then
@@ -46,23 +47,42 @@ cleanup() {
     rm -Rf ${TEMP_ROOT}
 }
 
-ARCH_AVAILABLE=$(ls /usr/bin | grep qemu | grep static | cut -d '-' -f2)
-if [ "_$(echo ${ARCH_AVAILABLE} | grep ${QEMU_ARCH})" == "" ]; then
-    echo "${QEMU_ARCH} is not available on your system (/usr/bin)"
+install_bsdtar() {
+    
+    VERSION="3.3.3"
+    FILE="libarchive-${VERSION}"
+    ARCHIVE="${FILE}.tar.gz"
+
+    test -f ${ARCHIVE} || wget "https://www.libarchive.org/downloads/${ARCHIVE}"
+    tar xzf ${ARCHIVE}
+    cd ${FILE}
+
+    ./configure
+
+    make -j4
+    make install
+    cd ${ROOT_DIR}
+}
+
+if [ "_$(ls /usr/bin | grep qemu-${QEMU_ARCH}-static)" == "_" ]; then
+    echo "cannot find qemu"
     exit 1
+else
+    if [ "$(qemu-${QEMU_ARCH}-static --version | head -n 1 | tr -s '[:space:]' | cut -d ' ' -f 3 | cut -d '.' -f 1)" -ge "2" ]
+    then
+        echo "your version of qemu is good!"
+    else
+        echo "qemu is old, it may result a broken image $(qemu-${QEMU_ARCH}-static --version)"
+    fi
 fi
 
 BSD_TAR_V=$(bsdtar --version | tr -s ' ' | cut -d ' ' -f 2)
 BSD_TAR_V_MAJOR=$(echo ${BSD_TAR_V} | cut -d '.' -f 1)
-BSD_TAR_V_MINOR=$(echo ${BSD_TAR_V} | cut -d '.' -f 1)
+BSD_TAR_V_MINOR=$(echo ${BSD_TAR_V} | cut -d '.' -f 2)
 if [ ${BSD_TAR_V_MAJOR} -ge "3" ] && [ ${BSD_TAR_V_MAJOR} -ge "3" ]; then
     echo "skipping local install of bsdtar"
 else
-    wget https://www.libarchive.org/downloads/libarchive-3.3.3.tar.gz
-    tar xzf libarchive-3.3.3.tar.gz
-    cd libarchive-3.3.3
-    ./configure && make && make install
-    cd ..
+    install_bsdtar
 fi
 
 make_and_partition_image

@@ -1,5 +1,8 @@
 dist: xenial
 sudo: required
+cache:
+  directories:
+    - $HOME/qemu
 addons:
   apt:
     update: true
@@ -9,10 +12,12 @@ addons:
     - dosfstools
     - zip
     - systemd-container
-before_install:
-  - sudo apt-get build-dep qemu
+before_script:
+  - bash -e ci/travis-qemu.sh
+  - ln -s $HOME/qemu/bin/qemu-aarch64 /usr/bin/qemu-aarch64-static 
+  - export PATH=$PATH:$HOME/qemu/bin
 script:
-  - sudo ./build_on_travis.sh
+- sudo ./build_image.sh
 deploy:
   provider: releases
   api_key:
