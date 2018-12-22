@@ -10,6 +10,7 @@ addons:
     - wget
     - dosfstools
     - zip
+    - systemd-container
 script:
 - sudo ./build_image.sh
 deploy:
