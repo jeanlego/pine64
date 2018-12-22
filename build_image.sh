@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ROOT_DIR=${PWD}
 
 # ensure running as root
