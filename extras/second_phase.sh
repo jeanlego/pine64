@@ -40,6 +40,12 @@ echo 'source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme' >> /root/
 usermod -s /bin/zsh casaadmin
 usermod -s /bin/zsh root
 
+# make it use tmux if it is a remote connection
+printf  "\
+[[ -z \"\${TMUX}\" ]] && [ \"\${SSH_CONNECTION}\" != \"\" ] && tmux new-session -A -s \${USER} \n\
+$(cat /home/casaadmin/.zshrc)\
+" > $/home/casaadmin/.zshrc
+
 systemctl enable change_hostname
 systemctl enable sshd
 systemctl enable docker
