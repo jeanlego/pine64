@@ -45,6 +45,8 @@ if [ "$(id -u)" -ne "0" ]; then
 	exit 1
 fi
 
+su root
+
 ARCH_AVAILABLE=$(ls /usr/bin | grep qemu | grep static | cut -d '-' -f2)
 if [ "_$(echo ${ARCH_AVAILABLE} | grep ${QEMU_ARCH})" == "" ]; then
     echo "${QEMU_ARCH} is not available on your system (/usr/bin)"
@@ -131,12 +133,17 @@ chmod +x ${TEMP_ROOT}/opt/change_hostname.sh
 cat > ${TEMP_ROOT}/etc/systemd/system/change_hostname.service <<EOF
 [Unit]
 Description=Set the hostname to the mac address
+DefaultDependencies=no
 After=sysinit.target
+Before=basic.target
 
 [Service]
 Type=oneshot
 ExecStart=/opt/change_hostname.sh
 TimeoutSec=0
+
+[Install]
+WantedBy=basic.target
 EOF
 
 echo "Mounting system partitions for chrooting"
