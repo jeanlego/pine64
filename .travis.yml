@@ -14,8 +14,9 @@ addons:
     - zip
     - systemd-container
 before_script:
-  - bash -e ci/travis-qemu.sh
-  - ln -s $HOME/qemu/bin/qemu-aarch64 /usr/bin/qemu-aarch64-static 
+  - export QEMU_ARCHES="aarch64"
+  - bash -e ci/travis-qemu.sh 
+  - ln -s $HOME/qemu/bin/qemu-${QEMU_ARCHES} /usr/bin/qemu-${QEMU_ARCHES}-static 
   - export PATH=$PATH:$HOME/qemu/bin
 script:
 - sudo ./build_image.sh

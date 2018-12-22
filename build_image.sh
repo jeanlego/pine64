@@ -7,19 +7,14 @@ if [ "$(id -u)" != "0" ]; then
     exec sudo "$0" "$@" 
 fi
 
-SRC=$1
-cd ${SRC}
-
-DESTINATION=$2
-
 IMAGE_NAME="sopine_arch_headless.img"
 size_of_image="6G"
 export LC_ALL=C
 
 TEMP_ROOT="build"
 
-QEMU_ARCH="aarch64"
-ROOTFS="ArchLinuxARM-${QEMU_ARCH}-latest.tar.gz"
+QEMU_ARCHES:="aarch64"
+ROOTFS="ArchLinuxARM-${QEMU_ARCHES}-latest.tar.gz"
 ROOTFS_URL="http://archlinuxarm.org/os/${ROOTFS}"
 
 trap cleanup EXIT
@@ -105,7 +100,7 @@ cp extras/change_hostname.service ${TEMP_ROOT}/etc/systemd/system/change_hostnam
 echo "Mounting system partitions for chrooting"
 mv ${TEMP_ROOT}/etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf.bckup
 cp /etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf
-cp $(which qemu-${QEMU_ARCH}-static) ${TEMP_ROOT}/usr/bin/qemu-${QEMU_ARCH}-static
+cp $(which qemu-${QEMU_ARCHES}-static) ${TEMP_ROOT}/usr/bin/qemu-${QEMU_ARCHES}-static
 
 systemd-nspawn -D ${TEMP_ROOT} extras/second_phase.sh
 
@@ -128,5 +123,3 @@ losetup -d $LOOP_DEVICE
 rm -Rf ${TEMP_ROOT}
 
 xz -k -v -1 --compress -T 2 ${IMAGE_NAME}
-
-cp ${IMAGE_NAME}.xz ${DESTINATION}/${IMAGE_NAME}.xz
