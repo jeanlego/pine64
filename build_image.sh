@@ -108,13 +108,7 @@ systemd-nspawn -D ${TEMP_ROOT} extras/second_phase.sh
 
 rm -f ${TEMP_ROOT}/usr/bin/qemu-*
 rm -f ${TEMP_ROOT}/etc/resolv.conf
-mv ${TEMP_ROOT}/etc/resolv.conf.bckup ${TEMP_ROOT}/etc/resolv.conf
-
-# make it use tmux if it is a remote connection
-printf  "\
-[[ -z \"\${TMUX}\" ]] && [ \"\${SSH_CONNECTION}\" != \"\" ] && tmux new-session -A -s \${USER} \n\
-$(cat ${TEMP_ROOT}/home/casaadmin/.zshrc)\
-" > ${TEMP_ROOT}/home/casaadmin/.zshrc 
+mv ${TEMP_ROOT}/etc/resolv.conf.bckup ${TEMP_ROOT}/etc/resolv.conf 
 
 umount ${TEMP_ROOT}
 
