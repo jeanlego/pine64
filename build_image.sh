@@ -216,4 +216,4 @@ dd if=u-boot-sunxi-with-spl-sopine.bin of=${LOOP_DEVICE} bs=8k seek=1
 losetup -d $LOOP_DEVICE
 rm -Rf ${TEMP_ROOT}
 
-xz -k -v --compress -T 0 ${IMAGE_NAME}
+xz -k -v -1 --compress -T 2 ${IMAGE_NAME}
