@@ -131,18 +131,12 @@ chmod +x ${TEMP_ROOT}/opt/change_hostname.sh
 cat > ${TEMP_ROOT}/etc/systemd/system/change_hostname.service <<EOF
 [Unit]
 Description=Set the hostname to the mac address
-DefaultDependencies=no
-After=sysinit.target local-fs.target
-Before=basic.target
+After=sysinit.target
 
 [Service]
 Type=oneshot
 ExecStart=/opt/change_hostname.sh
 TimeoutSec=0
-RemainAfterExit=yes
-
-[Install]
-WantedBy=basic.target
 EOF
 
 echo "Mounting system partitions for chrooting"
