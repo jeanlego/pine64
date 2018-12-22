@@ -43,7 +43,9 @@ usermod -s /bin/zsh root
 # make it use tmux if it is a remote connection
 printf  "\
 [[ -z \"\${TMUX}\" ]] && [ \"\${SSH_CONNECTION}\" != \"\" ] && tmux new-session -A -s \${USER} \n\
-$(cat /home/casaadmin/.zshrc)\
+autoload -Uz compinit promptinit\n\
+compinit\n\
+promptinit\n\
 " > $/home/casaadmin/.zshrc
 
 systemctl enable change_hostname
