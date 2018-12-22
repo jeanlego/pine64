@@ -54,6 +54,7 @@ else
     install_bsdtar
 fi
 
+[ ! -f $(which qemu-${QEMU_ARCHES}-static) ] && cp -f "$(which qemu-${QEMU_ARCHES})" "$(which qemu-${QEMU_ARCHES})-static"
 ###################
 # build the empty image
 truncate -s $size_of_image $IMAGE_NAME
