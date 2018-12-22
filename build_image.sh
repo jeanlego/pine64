@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# ensure running as root
+if [ "$(id -u)" != "0" ]; then
+    echo "This script requires root."
+    exec sudo "$0" "$@" 
+fi
+
 IMAGE_NAME="sopine_arch_headless.img"
 size_of_image="6G"
 export LC_ALL=C
@@ -39,13 +45,6 @@ cleanup() {
     rm -f ${IMAGE_NAME}
     rm -Rf ${TEMP_ROOT}
 }
-
-if [ "$(id -u)" -ne "0" ]; then
-	echo "This script requires root."
-	exit 1
-fi
-
-su root
 
 ARCH_AVAILABLE=$(ls /usr/bin | grep qemu | grep static | cut -d '-' -f2)
 if [ "_$(echo ${ARCH_AVAILABLE} | grep ${QEMU_ARCH})" == "" ]; then
