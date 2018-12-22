@@ -16,7 +16,7 @@ addons:
 before_script:
   - export QEMU_ARCHES="aarch64"
   - bash -e ci/travis-qemu.sh 
-  - [ ! -f $HOME/qemu/bin/qemu-${QEMU_ARCHES}-static ] && cp $HOME/qemu/bin/qemu-${QEMU_ARCHES} $HOME/qemu/bin/qemu-${QEMU-ARCHES}-static
+
   - export PATH=$PATH:$HOME/qemu/bin
 script:
 - sudo ./build_image.sh
