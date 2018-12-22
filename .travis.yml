@@ -2,6 +2,7 @@ dist: xenial
 sudo: required
 addons:
   apt:
+    update: true
     packages:
     - qemu
     - qemu-user-static
@@ -11,6 +12,8 @@ addons:
     - dosfstools
     - zip
     - systemd-container
+before_install:
+  - sudo apt-get build-dep qemu
 script:
 - sudo ./build_image.sh
 deploy:
