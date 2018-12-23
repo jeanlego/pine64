@@ -14,11 +14,20 @@ addons:
     - zip
     - systemd-container
 before_script:
+  - echo "deb http://ftp.debian.org/debian jessie-backports main\ndeb-src http://ftp.debian.org/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+  - sudo apt-get build-dep qemu
   - export QEMU_ARCHES="aarch64"
-  - bash -e ci/travis-qemu.sh
-  - export PATH=$PATH:$HOME/qemu/bin
+  - git clone https://github.com/julianxhokaxhiu/qemu.git qemu
+  - cd qemu 
+  - git checkout execve-2.9 
+  - ./configure --disable-bsd-user --disable-guest-agent --disable-strip --disable-werror --disable-gcrypt --disable-debug-info --disable-debug-tcg --enable-docs --disable-tcg-interpreter --enable-attr --disable-brlapi --disable-linux-aio --disable-bzip2 --disable-bluez --disable-cap-ng --disable-curl --disable-fdt --disable-glusterfs --disable-gnutls --disable-nettle --disable-gtk --disable-rdma --disable-libiscsi --disable-vnc-jpeg --disable-kvm --disable-lzo --disable-curses --disable-libnfs --disable-numa --disable-opengl --disable-vnc-png --disable-rbd --disable-vnc-sasl --disable-sdl --disable-seccomp --disable-smartcard --disable-snappy --disable-spice --disable-libssh2 --disable-libusb --disable-usb-redir --disable-vde --disable-vhost-net --disable-virglrenderer --disable-virtfs --disable-vnc --disable-vte --disable-xen --disable-xen-pci-passthrough --disable-xfsctl --enable-linux-user --disable-system --disable-blobs --disable-tools --target-list=arm-linux-user --static --disable-pie
+  - make -j 2
+  - make install
+  - export PATH=$PATH:$PWD/qemu/bin
 script:
-- sudo ./build_image.sh
+  - ls -R qemu/
+  - sudo ./build_image.sh
 deploy:
   provider: releases
   api_key:
