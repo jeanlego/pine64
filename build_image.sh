@@ -14,7 +14,7 @@ export LC_ALL=C
 
 TEMP_ROOT="build"
 
-QEMU_ARCHES:="aarch64"
+QEMU_ARCHES="aarch64"
 ROOTFS="ArchLinuxARM-${QEMU_ARCHES}-latest.tar.gz"
 ROOTFS_URL="http://archlinuxarm.org/os/${ROOTFS}"
 
@@ -28,33 +28,6 @@ cleanup() {
     rm -Rf ${TEMP_ROOT}
 }
 
-install_bsdtar() {
-    
-    VERSION="3.3.3"
-    FILE="libarchive-${VERSION}"
-    ARCHIVE="${FILE}.tar.gz"
-
-    test -f ${ARCHIVE} || wget "https://www.libarchive.org/downloads/${ARCHIVE}"
-    tar xzf ${ARCHIVE}
-    cd ${FILE}
-
-    ./configure
-
-    make -j4
-    make install
-    cd ${ROOT_DIR}
-}
-
-BSD_TAR_V=$(bsdtar --version | tr -s ' ' | cut -d ' ' -f 2)
-BSD_TAR_V_MAJOR=$(echo ${BSD_TAR_V} | cut -d '.' -f 1)
-BSD_TAR_V_MINOR=$(echo ${BSD_TAR_V} | cut -d '.' -f 2)
-if [ ${BSD_TAR_V_MAJOR} -ge "3" ] && [ ${BSD_TAR_V_MAJOR} -ge "3" ]; then
-    echo "skipping local install of bsdtar"
-else
-    install_bsdtar
-fi
-
-[ ! -f $(which qemu-${QEMU_ARCHES}-static) ] && cp -f "$(which qemu-${QEMU_ARCHES})" "$(which qemu-${QEMU_ARCHES})-static"
 ###################
 # build the empty image
 truncate -s $size_of_image $IMAGE_NAME
