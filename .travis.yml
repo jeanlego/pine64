@@ -1,9 +1,6 @@
 language: c
 dist: xenial
 sudo: required
-cache:
-  directories:
-    - $HOME/qemu
 addons:
   apt:
     update: true
@@ -12,20 +9,13 @@ addons:
     - wget
     - dosfstools
     - zip
-    - systemd-container
-    - binfmt-support
 before_script:
-  - sudo apt-get build-dep qemu
+  - sudo cp /etc/apt/sources.list /etc/apt/bionic.list
+  - sed -i 's/xenial/bionic/g /etc/apt/bionic.list'
+  - cat .travis_build/preferences > /etc/apt/preferences
+  - sudo apt-get update
+  - sudo apt-get install binfmt-support systemd-container qemu-user-static
   - export QEMU_ARCHES="aarch64"
-  - git clone git://git.qemu.org/qemu.git
-  - cd qemu 
-  - git submodule update --init --recursive
-  - sudo ./configure --static --disable-system --enable-linux-user
-  - sudo make -j 2
-  - sudo make install
-  - for i in bin/*; do sudo cp bin/$i bin/$i-static; done
-  - export PATH=$PATH:$PWD/bin
-  - cd ..
 script:
   - ls -R qemu/
   - sudo ./build_image.sh
