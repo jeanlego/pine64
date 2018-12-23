@@ -10,14 +10,9 @@ addons:
     - dosfstools
     - zip
 before_script:
-  - sudo cp /etc/apt/sources.list /etc/apt/bionic.list
-  - sed -i 's/xenial/bionic/g' /etc/apt/bionic.list
-  - cat .travis_build/preferences > /etc/apt/preferences
-  - sudo apt-get update
-  - sudo apt-get install binfmt-support systemd-container qemu-user-static
+  - sudo travis_build/before_build.sh
   - export QEMU_ARCHES="aarch64"
 script:
-  - ls -R qemu/
   - sudo ./build_image.sh
 deploy:
   provider: releases
