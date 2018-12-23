@@ -11,7 +11,7 @@ addons:
     - zip
 before_script:
   - sudo cp /etc/apt/sources.list /etc/apt/bionic.list
-  - sed -i 's/xenial/bionic/g /etc/apt/bionic.list'
+  - sed -i 's\xenial\bionic\g /etc/apt/bionic.list'
   - cat .travis_build/preferences > /etc/apt/preferences
   - sudo apt-get update
   - sudo apt-get install binfmt-support systemd-container qemu-user-static
