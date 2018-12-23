@@ -13,17 +13,17 @@ addons:
     - dosfstools
     - zip
     - systemd-container
+    - binfmt-support
 before_script:
-  - sudo apt-get update -qq
   - sudo apt-get build-dep qemu
   - export QEMU_ARCHES="aarch64"
   - git clone git://git.qemu.org/qemu.git
   - cd qemu 
   - git submodule update --init --recursive
-  - ./configure --static --disable-system --enable-linux-user
-  - make -j 2
-  - make install
-  - for i in bin/*; do cp bin/$i bin/$i-static; done
+  - sudo ./configure --static --disable-system --enable-linux-user
+  - sudo make -j 2
+  - sudo make install
+  - for i in bin/*; do sudo cp bin/$i bin/$i-static; done
   - export PATH=$PATH:$PWD/bin
   - cd ..
 script:
