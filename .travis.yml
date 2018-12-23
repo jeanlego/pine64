@@ -10,7 +10,7 @@ addons:
     - dosfstools
     - zip
 before_script:
-  - sudo travis_build/before_build.sh
+  - sudo .travis_build/before_build.sh
   - export QEMU_ARCHES="aarch64"
 script:
   - sudo ./build_image.sh
