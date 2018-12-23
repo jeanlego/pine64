@@ -78,7 +78,7 @@ cp /etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf
 cp $(which qemu-${QEMU_ARCHES}-static) ${TEMP_ROOT}/usr/bin/qemu-${QEMU_ARCHES}-static
 cp extras/second_phase.sh ${TEMP_ROOT}/opt/second_phase.sh
 
-systemd-nspawn -D ${TEMP_ROOT} extras/second_phase.sh
+systemd-nspawn -D ${TEMP_ROOT} "/opt/second_phase.sh"
 
 rm -f ${TEMP_ROOT}/opt/second_phase.sh
 rm -f ${TEMP_ROOT}/usr/bin/qemu-*
