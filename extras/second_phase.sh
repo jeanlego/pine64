@@ -1,14 +1,6 @@
 #!/bin/bash
 unset LD_PRELOAD 
 
-groupadd casaadmin
-usermod -d /home/casaadmin -m -g casaadmin -l casaadmin alarm
-usermod -a -G wheel casaadmin
-
-echo -e "forgetme\nforgetme" | passwd casaadmin
-echo -e "forgetme\nforgetme" | passwd
-passwd -e casaadmin
-
 pacman-key --init
 pacman-key --populate archlinuxarm
 killall -KILL gpg-agent
@@ -27,18 +19,9 @@ gzip -d UTF-8.gz
 locale-gen
 gzip UTF-8
 
-sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
-
-sed -i 's/#%wheel[\s]+ALL=(ALL)[\s]+ALL//g' /etc/sudoers
-echo -e "%wheel\tALL=(ALL) ALL" >> /etc/sudoers
-usermod -a -G docker casaadmin
-
-# install nicer theme
-echo 'source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme' >> /home/casaadmin/.zshrc
-echo 'source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme' >> /root/.zshrc
-
-usermod -s /bin/zsh casaadmin
-usermod -s /bin/zsh root
+groupadd casaadmin
+usermod -d /home/casaadmin -m -g casaadmin -l casaadmin alarm
+usermod -a -G wheel,docker casaadmin
 
 # make it use tmux if it is a remote connection
 printf  "\
@@ -46,11 +29,24 @@ printf  "\
 autoload -Uz compinit promptinit\n\
 compinit\n\
 promptinit\n\
-" > $/home/casaadmin/.zshrc
+source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme\n\
+" > /home/casaadmin/.zshrc
+cat /home/casaadmin/.zshrc > /root/.zshrc
+
+usermod -s /bin/zsh casaadmin
+usermod -s /bin/zsh root
+
+sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
+sed -i 's/#%wheel[\s]+ALL=(ALL)[\s]+ALL/%wheel[\s]+ALL=(ALL)[\s]+ALL/g' /etc/sudoers
 
 systemctl enable change_hostname
 systemctl enable sshd
 systemctl enable docker
+
+echo -e "forgetme\nforgetme" | passwd casaadmin
+echo -e "forgetme\nforgetme" | passwd
+passwd -e casaadmin
+passwd -e root
 
 yes | pacman -Scc
 exit 0
