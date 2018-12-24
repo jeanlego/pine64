@@ -23,7 +23,7 @@ pacman -Syu --noconfirm --needed zsh dosfstools curl xz netctl dialog \
     autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff \
     gzip libtool m4 make patch pkgconf sed sudo texinfo util-linux which docker cmake \
     git llvm clang bc unzip rsync wget curl vim cpio bison flex python gdb valgrind tmux \
-    zsh-theme-powerlevel9k powerline-fonts xterm
+    zsh-theme-powerlevel9k powerline-fonts xterm distcc
 
 yes | pacman -Scc
 
