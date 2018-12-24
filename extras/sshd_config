@@ -1,7 +1,0 @@
-AuthorizedKeysFile      .ssh/authorized_keys
-
-ChallengeResponseAuthentication no
-
-UsePAM yes
-
-Subsystem       sftp    /usr/lib/ssh/sftp-server

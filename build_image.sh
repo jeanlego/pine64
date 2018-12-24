@@ -78,16 +78,9 @@ else
 fi
 
 cp extras/resize_rootfs.sh ${TEMP_ROOT}/opt/resize_rootfs.sh
-cp extras/sysrq.conf ${TEMP_ROOT}/etc/sysctl.d/sysrq.conf
+cp extras/sysrq.conf ${TEMP_ROOT}
 cp extras/change_hostname.sh ${TEMP_ROOT}/opt/change_hostname.sh
 cp extras/change_hostname.service ${TEMP_ROOT}/etc/systemd/system/change_hostname.service
-cp extras/.tmux.conf ${TEMP_ROOT}/root/.tmux.conf
-
-sed -i 's|CheckSpace|#CheckSpace|' ${TEMP_ROOT}/etc/pacman.conf
-cat extras/pacman.conf >> ${TEMP_ROOT}/etc/pacman.conf
-
-rm -f ${TEMP_ROOT}/etc/sudoers
-cp extras/sudoers ${TEMP_ROOT}/etc/sudoers
 
 echo "Mounting system partitions for chrooting"
 mv ${TEMP_ROOT}/etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf.bckup
