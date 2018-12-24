@@ -1,6 +1,5 @@
 #!/bin/bash
 unset LD_PRELOAD 
-
 pacman-key --init
 pacman-key --populate archlinuxarm
 killall -KILL gpg-agent

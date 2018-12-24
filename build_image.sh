@@ -66,8 +66,8 @@ cp extras/change_hostname.sh ${TEMP_ROOT}/opt/change_hostname.sh
 cp extras/change_hostname.service ${TEMP_ROOT}/etc/systemd/system/change_hostname.service
 cp extras/.tmux.conf ${TEMP_ROOT}/root/.tmux.conf
 
-rm -f ${TEMP_ROOT}/etc/pacman.conf
-cp extras/pacman.conf ${TEMP_ROOT}/etc/pacman.conf
+sed -i 's|CheckSpace|#CheckSpace|' ${TEMP_ROOT}/etc/pacman.conf
+cat extras/pacman.conf >> ${TEMP_ROOT}/etc/pacman.conf
 
 rm -f ${TEMP_ROOT}/etc/sudoers
 cp extras/sudoers ${TEMP_ROOT}/etc/sudoers
