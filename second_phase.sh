@@ -7,7 +7,7 @@ echo "\
 SigLevel = Never
 Server = https://github.com/anarsoul/PKGBUILDs/releases/download/mainline/
 " >> /etc/pacman.conf
-sed -i 's|CheckSpace|#CheckSpace|' /etc/pacman.conf
+sed -i '/CheckSpace/s/^#[[:space:]]*//g' /etc/pacman.conf
 
 echo "\
 kernel.sysrq = 0
@@ -18,38 +18,32 @@ echo "\
 " > /etc/hosts
 
 echo "\
-[Unit]
-Description=Set the hostname to the mac address
-DefaultDependencies=no
-After=basic.target
-Before=network.target
-ConditionFirstBoot=true
-
-[Service]
-Type=oneshot
-ExecStart=hostnamectl set-hostname \"device-\$(sed 's/:/-/g' /sys/class/net/eth0/address)\"
-TimeoutSec=0
-
-[Install]
-WantedBy=network.target
-" > /etc/systemd/system/change_hostname.service
+#!/bin/bash
+hostnamectl set-hostname \"device-\$(sed 's/:/-/g' /sys/class/net/eth0/address)\"
+parted /dev/mmcblk0 resize 1 100%
+partx -u /dev/mmcblk0
+resize2fs /dev/mmcblk0p1
+systemctl disable first_boot
+rm -f /etc/systemd/system/first_boot.service
+exit
+" > /opt/first_boot.sh
+chmod +x /opt/first_boot.sh
 
 echo "\
 [Unit]
-Description=Grow the partition to its max size
+Description=Set the hostname to the mac address
 DefaultDependencies=no
-After=basic.target
-Before=network.target
-ConditionFirstBoot=true
+After=sysinit.target
+Before=basic.target
 
 [Service]
 Type=oneshot
-ExecStart=parted /dev/mmcblk0 resize 1 100% && partx -u /dev/mmcblk0 && resize2fs /dev/mmcblk0p1
+ExecStart=/opt/first_boot.sh
 TimeoutSec=0
 
 [Install]
-WantedBy=network.target
-" > /etc/systemd/system/resize_rootfs.service
+WantedBy=basic.target
+" > /etc/systemd/system/first_boot.service
 
 pacman-key --init
 pacman-key --populate archlinuxarm
@@ -61,7 +55,7 @@ pacman -Syu --noconfirm --needed zsh dosfstools curl xz netctl dialog \
     autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff \
     gzip libtool m4 make patch pkgconf sed sudo texinfo util-linux which docker cmake \
     git llvm clang bc unzip rsync wget curl vim cpio bison flex python gdb valgrind tmux \
-    zsh-theme-powerlevel9k powerline-fonts xterm distcc
+    zsh-theme-powerlevel9k powerline-fonts xterm distcc parted
 
 yes | pacman -Scc
 
@@ -71,7 +65,7 @@ gzip -d UTF-8.gz
 locale-gen
 gzip UTF-8
 
-systemctl enable change_hostname
+systemctl enable first_boot
 systemctl enable resize_rootfs
 systemctl enable sshd
 systemctl enable docker
@@ -97,7 +91,11 @@ echo "\
 export LANG=\"en_us.UTF-8\"
 export TERM=\"xterm-256color\"
 
-[[ -z \"\${TMUX}\" ]] && [ \"\${SSH_CONNECTION}\" != \"\" ] && tmux new-session -A -s \${USER} 
+if [[ -z \"\${TMUX}\" ]] && [ \"\${SSH_CONNECTION}\" != \"\" ];
+then  
+    tmux new-session -A -s \${USER} 
+    exit
+fi
 
 autoload -Uz compinit promptinit
 
