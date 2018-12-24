@@ -19,31 +19,9 @@ echo "\
 
 echo "\
 #!/bin/bash
-hostnamectl set-hostname \"device-\$(sed 's/:/-/g' /sys/class/net/eth0/address)\"
-parted /dev/mmcblk0 resize 1 100%
-partx -u /dev/mmcblk0
-resize2fs /dev/mmcblk0p1
-systemctl disable first_boot
-rm -f /etc/systemd/system/first_boot.service
-exit
+
 " > /opt/first_boot.sh
 chmod +x /opt/first_boot.sh
-
-echo "\
-[Unit]
-Description=Set the hostname to the mac address
-DefaultDependencies=no
-After=sysinit.target
-Before=basic.target
-
-[Service]
-Type=oneshot
-ExecStart=/opt/first_boot.sh
-TimeoutSec=0
-
-[Install]
-WantedBy=basic.target
-" > /etc/systemd/system/first_boot.service
 
 pacman-key --init
 pacman-key --populate archlinuxarm
@@ -65,8 +43,6 @@ gzip -d UTF-8.gz
 locale-gen
 gzip UTF-8
 
-systemctl enable first_boot
-systemctl enable resize_rootfs
 systemctl enable sshd
 systemctl enable docker
 
@@ -103,8 +79,48 @@ compinit
 promptinit
 
 source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme
+" > /root/.zshrc
+
+echo "\
+export LANG=\"en_us.UTF-8\"
+export TERM=\"xterm-256color\"
+
+if [ "_$(cat hostname | grep device)" == "_" ]; then
+
+    echo \" this is your first boot, we will help you set things up! :) \"
+
+    NEW_NAME=\"device-\$(sed 's/:/-/g' /sys/class/net/eth0/address)\"
+    echo \"###############
+    first we will rename hostname to \${NEW_NAME}\"
+    hostnamectl set-hostname \${NEW_NAME}
+
+    echo \"###############
+    we will help you resize the root partition\"
+    parted /dev/mmcblk0 resize 1
+    partx -u /dev/mmcblk0
+    resize2fs /dev/mmcblk0p1
+
+    echo \"###############
+    Done initial boot now rebooting!\"
+
+    sudo reboot
+    exit
+fi
+
+if [[ -z \"\${TMUX}\" ]] && [ \"\${SSH_CONNECTION}\" != \"\" ];
+then  
+    tmux new-session -A -s \${USER} 
+    exit
+fi
+
+autoload -Uz compinit promptinit
+
+compinit
+promptinit
+
+source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme
+
 " > /home/casaadmin/.zshrc
-cat /home/casaadmin/.zshrc > /root/.zshrc
 
 echo "\
 set -g mouse on
