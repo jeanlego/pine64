@@ -85,7 +85,7 @@ echo "\
 export LANG=\"en_us.UTF-8\"
 export TERM=\"xterm-256color\"
 
-if [ "_$(cat hostname | grep device)" == "_" ]; then
+if [ \"_\$(hostname | grep device)\" == \"_\" ]; then
 
     echo \" this is your first boot, we will help you set things up! :) \"
 
