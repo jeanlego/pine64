@@ -77,20 +77,15 @@ else
     echo "OK"
 fi
 
-cp extras/resize_rootfs.sh ${TEMP_ROOT}/opt/resize_rootfs.sh
-cp extras/sysrq.conf ${TEMP_ROOT}
-cp extras/change_hostname.sh ${TEMP_ROOT}/opt/change_hostname.sh
-cp extras/change_hostname.service ${TEMP_ROOT}/etc/systemd/system/change_hostname.service
-
 echo "Mounting system partitions for chrooting"
 mv ${TEMP_ROOT}/etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf.bckup
 cp /etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf
 cp $(which qemu-${QEMU_ARCHES}-static) ${TEMP_ROOT}/usr/bin/qemu-${QEMU_ARCHES}-static
-cp extras/second_phase.sh ${TEMP_ROOT}/opt/second_phase.sh
 
+cp second_phase.sh ${TEMP_ROOT}/opt/second_phase.sh
 systemd-nspawn -D ${TEMP_ROOT} "/opt/second_phase.sh"
-
 rm -f ${TEMP_ROOT}/opt/second_phase.sh
+
 rm -f ${TEMP_ROOT}/usr/bin/qemu-*
 rm -f ${TEMP_ROOT}/etc/resolv.conf
 mv ${TEMP_ROOT}/etc/resolv.conf.bckup ${TEMP_ROOT}/etc/resolv.conf 

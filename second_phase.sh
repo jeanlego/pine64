@@ -13,6 +13,44 @@ echo "\
 kernel.sysrq = 0
 " > /etc/sysctl.d/sysrq.conf
 
+echo "\
+127.0.0.1 localhost
+" > /etc/hosts
+
+echo "\
+[Unit]
+Description=Set the hostname to the mac address
+DefaultDependencies=no
+After=basic.target
+Before=network.target
+ConditionFirstBoot=true
+
+[Service]
+Type=oneshot
+ExecStart=hostnamectl set-hostname \"device-\$(sed 's/:/-/g' /sys/class/net/eth0/address)\"
+TimeoutSec=0
+
+[Install]
+WantedBy=network.target
+" > /etc/systemd/system/change_hostname.service
+
+echo "\
+[Unit]
+Description=Grow the partition to its max size
+DefaultDependencies=no
+After=basic.target
+Before=network.target
+ConditionFirstBoot=true
+
+[Service]
+Type=oneshot
+ExecStart=parted /dev/mmcblk0 resize 1 100% && partx -u /dev/mmcblk0 && resize2fs /dev/mmcblk0p1
+TimeoutSec=0
+
+[Install]
+WantedBy=network.target
+" > /etc/systemd/system/resize_rootfs.service
+
 pacman-key --init
 pacman-key --populate archlinuxarm
 killall -KILL gpg-agent
@@ -27,13 +65,14 @@ pacman -Syu --noconfirm --needed zsh dosfstools curl xz netctl dialog \
 
 yes | pacman -Scc
 
-sed -i 's|^#en_US.UTF-8|en_US.UTF-8|' /etc/locale.gen
+sed -i '/en_US.UTF-8/s/^#[[:space:]]*//g' /etc/locale.gen
 cd /usr/share/i18n/charmaps
 gzip -d UTF-8.gz
 locale-gen
 gzip UTF-8
 
 systemctl enable change_hostname
+systemctl enable resize_rootfs
 systemctl enable sshd
 systemctl enable docker
 
@@ -46,9 +85,8 @@ chown -Rf casaadmin:wheel /home/casaadmin
 usermod -s /bin/zsh casaadmin
 usermod -s /bin/zsh root
 
-sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
-
-sed -i 's/#[\s]+%wheel[\s]+ALL=(ALL)[\s]+ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
+sed -i '/PermitRootLogin/s/[[:space:]]*yes/ no/g' /etc/ssh/sshd_config
+sed -i '/%wheel[[:space:]]*ALL=(ALL)[[:space:]]*ALL/s/^#[[:space:]]*//g' /etc/sudoers
 
 echo -e "forgetme\nforgetme" | passwd casaadmin
 echo -e "forgetme\nforgetme" | passwd
