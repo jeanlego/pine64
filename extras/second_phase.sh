@@ -23,21 +23,15 @@ groupadd casaadmin
 usermod -d /home/casaadmin -m -g casaadmin -l casaadmin alarm
 usermod -a -G wheel,docker casaadmin
 
-# make it use tmux if it is a remote connection
-printf  "\
-[[ -z \"\${TMUX}\" ]] && [ \"\${SSH_CONNECTION}\" != \"\" ] && tmux new-session -A -s \${USER} \n\
-autoload -Uz compinit promptinit\n\
-compinit\n\
-promptinit\n\
-source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme\n\
-" > /home/casaadmin/.zshrc
-cat /home/casaadmin/.zshrc > /root/.zshrc
+cat /root/.zshrc > /home/casaadmin/.zshrc
+cat /root/.tmux.conf > /home/casaadmin/.tmux.conf
+
+chown -Rf casaadmin:wheel /home/casaadmin
 
 usermod -s /bin/zsh casaadmin
 usermod -s /bin/zsh root
 
 sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
-sed -i 's/#%wheel[\s]+ALL=(ALL)[\s]+ALL/%wheel[\s]+ALL=(ALL)[\s]+ALL/g' /etc/sudoers
 
 systemctl enable change_hostname
 systemctl enable sshd
