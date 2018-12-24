@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ROOT_DIR=${PWD}
+export LC_ALL=C
+TEMP_ROOT="build"
 
 # ensure running as root
 if [ "$(id -u)" != "0" ]; then
@@ -8,29 +10,16 @@ if [ "$(id -u)" != "0" ]; then
     exec sudo "$0" "$@" 
 fi
 
-IMAGE_NAME="sopine_arch_headless.img"
-size_of_image="4G"
-export LC_ALL=C
-
-TEMP_ROOT="build"
-
-QEMU_ARCHES="aarch64"
-ROOTFS="ArchLinuxARM-${QEMU_ARCHES}-latest.tar.gz"
-ROOTFS_URL="http://archlinuxarm.org/os/${ROOTFS}"
-
-trap cleanup EXIT
-
-cleanup() {
-    losetup -d $LOOP_DEVICE
-    umount ${TEMP_ROOT}
-
-    rm -f ${IMAGE_NAME}
-    rm -Rf ${TEMP_ROOT}
-}
+IMAGE_NAME=$1
+if [ "_${IMAGE_NAME}" == "_" ]
+then
+    echo "please specify an image name"
+    exit 1
+fi
 
 ###################
 # build the empty image
-truncate -s $size_of_image $IMAGE_NAME
+truncate -s $IMAGE_SIZE $IMAGE_NAME
 
 echo "Creating filesystems"
 
@@ -50,15 +39,43 @@ mount ${LOOP_DEVICE}p1 $TEMP_ROOT
 
 echo "mounted the image on ${LOOP_DEVICE}->$TEMP_ROOT"
 
-echo "Downloading rootfs tarball ..."
-wget $ROOTFS_URL
-
-# Extract with BSD tar
-echo -n "Extracting ... "
-bsdtar -xpf "$ROOTFS" -C "$TEMP_ROOT"
-echo "OK"
-
 sync
+
+trap cleanup EXIT
+
+cleanup() {
+    losetup -d $LOOP_DEVICE
+    umount ${TEMP_ROOT}
+    rm -Rf ${TEMP_ROOT}
+}
+
+QEMU_ARCHES=$2
+if [ "_${QEMU_ARCHES}" == "_" ]
+then
+    echo "please specify an architecture"
+    exit 1
+fi
+
+IMAGE_SIZE=$3
+if [ "_${IMAGE_SIZE}" == "_" ]
+then
+    echo "please specify a size for the image ie. 3G or 300M"
+    exit 1
+fi
+
+ROOTFS_URL=$4
+if [ "_${ROOTFS_URL}" == "_" ]
+then
+    echo "please specify an URL for the rootfs"
+    exit 1
+else
+    echo "Downloading rootfs tarball ..."
+    wget $ROOTFS_URL || (echo "cannot download image" && exit 1)
+    # Extract with BSD tar
+    echo -n "Extracting ... "
+    bsdtar -xpf "$(basename ${ROOTFS_URL})" -C "$TEMP_ROOT"
+    echo "OK"
+fi
 
 cp extras/resize_rootfs.sh ${TEMP_ROOT}/opt/resize_rootfs.sh
 cp extras/sysrq.conf ${TEMP_ROOT}/etc/sysctl.d/sysrq.conf
@@ -92,5 +109,3 @@ dd if=${TEMP_ROOT}/boot/u-boot-sunxi-with-spl-sopine.bin of=${LOOP_DEVICE} bs=8k
 umount ${TEMP_ROOT}
 losetup -d $LOOP_DEVICE
 rm -Rf ${TEMP_ROOT}
-
-xz -k -v -1 --compress -T 2 ${IMAGE_NAME}

@@ -12,12 +12,14 @@ addons:
 before_script:
   - sudo .travis_build/before_build.sh
 script:
-  - sudo ./build_image.sh
+  - export IMAGE="sopine_arch_headless.img"
+  - sudo ./build_image.sh "${IMAGE}" "aarch64" "http://archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+  - xz -k -v -1 --compress -T 2 ${IMAGE}
 deploy:
   provider: releases
   api_key:
     secure: csd25m7/7gpVZTuA810jxjIuGDtpd91dtCvYlRstZp0AROfYcIfSwNaXEQ5EB4cpWMtXAxWpIgCzXmjr8swzwy6KWgxOgrhcRPqPjyNcOhM9/gDs6hxS70Lnj9QIlPexVQ0dKQRXABBvzcU5XmFrtEoMlelQt2vBeSL+HHNcX6dyzUkJk5W9NemUp31G3anwMD1Oxv/+WMcew97uqDnoZwqZlm5oDQfiwhK+jApfv3NYrTuhL2wFUv3Ab7f6+JZBcw7cBDS3CHWLZWSG79yocSkcznMA9gEU9qKtcNoaIYG+ZgpCOW8daY7JSmj+k27ltCLIWA11sIeiSfMnrgsE7vBSpl5yubTYCn9ON9EKVxJuUA37FMiEfJJAkOn75ei2R5df2YnNRscWaBinPZKGIgXtS/xOUbmJDHDsArpYGilxNA/ZNhr48IiPOWRH+ds4QPndbw47RRSE2IALCUraHG329ZcSuZTvVulA2lL4VfRFf49LDnTxBmZSqwspzq2jjBXMzXX4/f0w+o0EVPEIQw2szpgM12i+kkgtKmDcTRSt+OMNARIvEmsLCbILGJz9z4xhqESiZdjac9xMOx+lb5oGDMW/0F9EopeKT2eqkpRj6bZUK84uLNsdoBMpsE4BctIkTlDMGtL0hIqVaU7RerT7Hu7aXw/cLyDjI44Z3uQ=
-  file: sopine_arch_headless.img.xz
+  file: ${IMAGE}.xz
   skip_cleanup: true
   on:
     repo: jeanlego/linux-build
