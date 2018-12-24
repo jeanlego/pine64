@@ -17,6 +17,13 @@ then
     exit 1
 fi
 
+IMAGE_SIZE=$2
+if [ "_${IMAGE_SIZE}" == "_" ]
+then
+    echo "please specify a size for the image ie. 3G or 300M"
+    exit 1
+fi
+
 ###################
 # build the empty image
 truncate -s $IMAGE_SIZE $IMAGE_NAME
@@ -49,17 +56,10 @@ cleanup() {
     rm -Rf ${TEMP_ROOT}
 }
 
-QEMU_ARCHES=$2
+QEMU_ARCHES=$3
 if [ "_${QEMU_ARCHES}" == "_" ]
 then
     echo "please specify an architecture"
-    exit 1
-fi
-
-IMAGE_SIZE=$3
-if [ "_${IMAGE_SIZE}" == "_" ]
-then
-    echo "please specify a size for the image ie. 3G or 300M"
     exit 1
 fi
 

@@ -13,7 +13,7 @@ before_script:
   - sudo .travis_build/before_build.sh
 script:
   - export IMAGE="sopine_arch_headless.img"
-  - sudo ./build_image.sh "${IMAGE}" "aarch64" "4G" "http://archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+  - sudo ./build_image.sh "${IMAGE}" "4G" "aarch64" "http://archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
   - xz -k -v -1 --compress -T 2 ${IMAGE}
 deploy:
   provider: releases
