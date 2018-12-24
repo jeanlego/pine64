@@ -9,7 +9,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 IMAGE_NAME="sopine_arch_headless.img"
-size_of_image="6G"
+size_of_image="4G"
 export LC_ALL=C
 
 TEMP_ROOT="build"
@@ -50,12 +50,8 @@ mount ${LOOP_DEVICE}p1 $TEMP_ROOT
 
 echo "mounted the image on ${LOOP_DEVICE}->$TEMP_ROOT"
 
-if [ ! -f ${ROOTFS} ]; then
-    echo "Downloading rootfs tarball ..."
-    wget $ROOTFS_URL
-fi
-
-sync
+echo "Downloading rootfs tarball ..."
+wget $ROOTFS_URL
 
 # Extract with BSD tar
 echo -n "Extracting ... "
@@ -89,11 +85,11 @@ rm -f ${TEMP_ROOT}/usr/bin/qemu-*
 rm -f ${TEMP_ROOT}/etc/resolv.conf
 mv ${TEMP_ROOT}/etc/resolv.conf.bckup ${TEMP_ROOT}/etc/resolv.conf 
 
-umount ${TEMP_ROOT}
 
 echo "Installing bootloader"
-dd if=extras/u-boot-sunxi-with-spl-sopine.bin of=${LOOP_DEVICE} bs=8k seek=1
+dd if=${TEMP_ROOT}/boot/u-boot-sunxi-with-spl-sopine.bin of=${LOOP_DEVICE} bs=8k seek=1
 
+umount ${TEMP_ROOT}
 losetup -d $LOOP_DEVICE
 rm -Rf ${TEMP_ROOT}
 
