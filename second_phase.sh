@@ -29,22 +29,6 @@ exit
 " > /opt/first_boot.sh
 chmod +x /opt/first_boot.sh
 
-echo "\
-[Unit]
-Description=Set the hostname to the mac address
-DefaultDependencies=no
-After=sysinit.target
-Before=basic.target
-
-[Service]
-Type=oneshot
-ExecStart=/opt/first_boot.sh
-TimeoutSec=0
-
-[Install]
-WantedBy=basic.target
-" > /etc/systemd/system/first_boot.service
-
 pacman-key --init
 pacman-key --populate archlinuxarm
 killall -KILL gpg-agent
@@ -65,8 +49,6 @@ gzip -d UTF-8.gz
 locale-gen
 gzip UTF-8
 
-systemctl enable first_boot
-systemctl enable resize_rootfs
 systemctl enable sshd
 systemctl enable docker
 
