@@ -28,6 +28,9 @@ fi
 # build the empty image
 truncate -s $IMAGE_SIZE $IMAGE_NAME
 
+# zero the beginning of the image
+dd if=/dev/zero of=$IMAGE_NAME bs=1M count=32
+
 echo "Creating filesystems"
 (
 echo o # Create a new empty DOS partition table
@@ -39,6 +42,18 @@ echo   # Last sector (Accept default: varies)
 echo p # print layout
 echo w # Write changes
 ) | sudo fdisk $IMAGE_NAME
+
+echo "Setting up idbloader"
+wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/idbloader.img
+dd if=idbloader.img of=$IMAGE_NAME seek=64 conv=notrunc
+
+echo "Setting up uboot"
+wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/uboot.img
+dd if=uboot.img of=$IMAGE_NAME seek=16384 conv=notrunc
+
+echo "Setting up trust"
+wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/trust.img
+dd if=trust.img of=$IMAGE_NAME seek=24576 conv=notrunc
 
 echo "Attaching loop device"
 LOOP_DEVICE=$(losetup -f)
@@ -86,18 +101,6 @@ fi
 echo "placing boot.scr @ /boot"
 wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/boot.scr -O ${TEMP_ROOT}/boot/boot.scr
 
-echo "Setting up idbloader"
-wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/idbloader.img
-dd if=idbloader.img of=/dev/sdX seek=64 conv=notrunc
-
-echo "Setting up uboot"
-wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/uboot.img
-dd if=uboot.img of=/dev/sdX seek=16384 conv=notrunc
-
-echo "Setting up trust"
-wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/trust.img
-dd if=trust.img of=/dev/sdX seek=24576 conv=notrunc
-
 echo "Mounting system partitions for chrooting"
 mv ${TEMP_ROOT}/etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf.bckup
 cp /etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf
@@ -114,3 +117,7 @@ mv ${TEMP_ROOT}/etc/resolv.conf.bckup ${TEMP_ROOT}/etc/resolv.conf
 umount ${TEMP_ROOT}
 losetup -d $LOOP_DEVICE
 rm -Rf ${TEMP_ROOT}
+
+
+
+
