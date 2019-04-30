@@ -15,8 +15,7 @@ hostnamectl set-hostname \"device-\$(sed 's/:/-/g' /sys/class/net/eth0/address)\
 parted /dev/mmcblk0 resize 1 100%
 partx -u /dev/mmcblk0
 resize2fs /dev/mmcblk0p1
-systemctl disable first_boot
-rm -f /etc/systemd/system/first_boot.service
+sudo pacman -Sy uboot-rock64
 exit
 " > /opt/first_boot.sh
 chmod +x /opt/first_boot.sh
