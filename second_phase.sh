@@ -29,7 +29,7 @@ killall -KILL gpg-agent
 pacman -Syu --noconfirm
 pacman -Rsn --noconfirm linux-aarch64
 pacman -Syu --noconfirm --needed zsh dosfstools curl xz netctl dialog \
-	pv filesystem uboot-rock64 \
+	pv filesystem \
     autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff \
     gzip libtool m4 make patch pkgconf sed sudo texinfo util-linux which docker cmake \
     git llvm clang bc unzip rsync wget curl vim cpio bison flex python gdb valgrind tmux \
