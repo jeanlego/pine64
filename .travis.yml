@@ -13,7 +13,7 @@ before_script:
 - sudo .travis_build/before_build.sh
 script:
 - export IMAGE=aarch64_headless.img
-- sudo ./build_image.sh "${IMAGE}" "4G" "aarch64" "http://archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+- sudo ./build_image.sh "${IMAGE}" "4G"
 - sudo xz -k -v -1 --compress -T 2 ${IMAGE}
 deploy:
   provider: releases
