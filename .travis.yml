@@ -10,17 +10,16 @@ addons:
     - dosfstools
     - zip
 before_script:
-  - sudo .travis_build/before_build.sh
+- sudo .travis_build/before_build.sh
 script:
-  - export IMAGE="sopine_arch_headless.img"
-  - sudo ./build_image.sh "${IMAGE}" "4G" "aarch64" "http://archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
-  - sudo xz -k -v -1 --compress -T 2 ${IMAGE}
+- export IMAGE="sopine_arch_headless.img"
+- sudo ./build_image.sh "${IMAGE}" "4G" "aarch64" "http://archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+- sudo xz -k -v -1 --compress -T 2 ${IMAGE}
 deploy:
   provider: releases
   api_key:
-    secure: csd25m7/7gpVZTuA810jxjIuGDtpd91dtCvYlRstZp0AROfYcIfSwNaXEQ5EB4cpWMtXAxWpIgCzXmjr8swzwy6KWgxOgrhcRPqPjyNcOhM9/gDs6hxS70Lnj9QIlPexVQ0dKQRXABBvzcU5XmFrtEoMlelQt2vBeSL+HHNcX6dyzUkJk5W9NemUp31G3anwMD1Oxv/+WMcew97uqDnoZwqZlm5oDQfiwhK+jApfv3NYrTuhL2wFUv3Ab7f6+JZBcw7cBDS3CHWLZWSG79yocSkcznMA9gEU9qKtcNoaIYG+ZgpCOW8daY7JSmj+k27ltCLIWA11sIeiSfMnrgsE7vBSpl5yubTYCn9ON9EKVxJuUA37FMiEfJJAkOn75ei2R5df2YnNRscWaBinPZKGIgXtS/xOUbmJDHDsArpYGilxNA/ZNhr48IiPOWRH+ds4QPndbw47RRSE2IALCUraHG329ZcSuZTvVulA2lL4VfRFf49LDnTxBmZSqwspzq2jjBXMzXX4/f0w+o0EVPEIQw2szpgM12i+kkgtKmDcTRSt+OMNARIvEmsLCbILGJz9z4xhqESiZdjac9xMOx+lb5oGDMW/0F9EopeKT2eqkpRj6bZUK84uLNsdoBMpsE4BctIkTlDMGtL0hIqVaU7RerT7Hu7aXw/cLyDjI44Z3uQ=
-  file: ${IMAGE}.xz
-  skip_cleanup: true
+    secure: gKMrqF32JJxopFWNF+Tuv4B5H7ZifyOZyUsLLdW/wutHQFdPRya9WI7VpFGePAh1pq70dNH3m2IzVZRkd9VCFmUwvuAeeK35t5h+GCEHI2BOjyF6eYq4NW0v2n31P655SvoFgM/536Ords3PDDPfw/3t8ef9b4em0qdhWt4nrFjn7qYDpwAPSKf8VDvtu+qE98NW34Rnueof2kzRcLFHiGfbLRwPPoDO25UXaAssqc9ejO4iqN7AyjoHVuCgsMgDSSNkhDD8rROzsFOGZ87yUhvK+Svwhq80Go4CSL6SzHP6cd2/ig3uCn4U81jwLQnP7gi09Tc5tLTsUjZINV+QGRylGjznzoVXB0VD4eQhUgeF5DOPJhatsqeNSoQT7YhYW4EunmuMRcVW/DNmTzv3PBPLGkSrOUiOp2h8jo9TCxS/mpm7QU2Zs+QVNZvZm7O5NDw6jr0wYg+Ljf8HoI5DvoNqfmrEKqxehrAVPP2Ye3Mw0u2i7L+aq5P6DeN/+OII7u4ud7GsetOiIND9TdqvwvYPUb6mdRdH/6Y4x4ffJq6eRPB8rQ2KbRvf7a23ACaU59+Ozq+c9OKtdDTyos+YppjyjcRCZ8gUwKeh94TFLzf9hozZvuen9nF2W4YcMnIR90kRW9N2Mna/mAaPeFb6Do/RiwfX4AWsTYlFUkNS0n4=
+  file: "${IMAGE}.xz"
   on:
-    repo: jeanlego/linux-build
-    branch: mainline
+    repo: jeanlego/pine64
+    branch: heads/mainline
