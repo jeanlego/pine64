@@ -1,4 +1,6 @@
-# linux-build
-Pine64 Linux build scripts, tools and instructions (based on Longsleep work)
+# Pine 64
 
-This is a fork that specializes the arch image to make it a server only image.
+This stems off ayufan's work, made for Rock64
+
+# Current Status
+[![Build Status](https://travis-ci.com/jeanlego/pine64.svg?branch=mainline)](https://travis-ci.com/jeanlego/pine64)
