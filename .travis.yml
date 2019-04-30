@@ -20,3 +20,6 @@ deploy:
     secure: fg//VU7u4FJDl9mc7YRSl0KKLpmIbEk8F60KI0tOVXlEycjSfv3WFSC8E+f+w0acf/ao1ll7o42W6R4tNdKYUpvKYeXK+mwOH/aKSb0tTR+keNWfgcToORuipsZmHtZy9A0AqeogkcTVnbAY+ua/E+h2oylmYTH6s5qUKO9qcjhcijGI2zKt86Rv6/XjxF4+nXtd1RfwZvqf/otdfSzuczmd8mweulbbG+wnh7G3YKbNkgYUJ67R04/0kjvl46IFW7W/HxiHDFuvZBRHFYawANrRMbugUcC+yqKc41+NJAH4aHwlT5MMw6I+wGqp06jc/ySaYz5J91+oXb2oS2vkxHRChKvHC4YHq9VdVyiYV5u4xXYN+ksK8yZ9VCIwqveBpFg9EY3WQZLG+EkCd42wYwZBYTktj3C/M9Ib3ph7P1exAQKARrO2VuH5UyV3S0GAjmrkPGuUYz6EEWxU+1jtmcWvzvSKtdJed+KrNYXovbwYNvCtN/g4WarCdOM/Gps+hflTvswW7TQlr8Lkoh3WZXQoark0hc0sYs+QZj5M89IDRebnYwxXmkCvzAfSrufTREF9jfNAEc6KWZ7G5wxJQtN9/AmlchJc9LoFaCJKHvKQ8ZFUXDdNPXiSa0dt3IVPKxv3Iz5N1buw2ICmaemAmgjtsKk2veY9raQzr40Rb1U=
   file: aarch64_headless.img.xz
   skip_cleanup: true
+  on:
+    repo: jeanlego/pine64
+    branch: mainline
