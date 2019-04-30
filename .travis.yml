@@ -12,9 +12,8 @@ addons:
 before_script:
 - sudo .travis_build/before_build.sh
 script:
-- export IMAGE=aarch64_headless.img
-- sudo ./build_image.sh "${IMAGE}" "4G"
-- sudo xz -k -v -1 --compress -T 2 ${IMAGE}
+- sudo ./build_image.sh
+- sudo xz -k -v -1 --compress -T 2 aarch64_headless.img
 deploy:
   provider: releases
   api_key:
