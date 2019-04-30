@@ -13,7 +13,6 @@ if [ "$(id -u)" != "0" ]; then
     exec sudo "$0" "$@" 
 fi
 
-IMAGE_SIZE=4G
 trap cleanup EXIT
 
 cleanup() {
