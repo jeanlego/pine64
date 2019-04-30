@@ -2,14 +2,6 @@
 unset LD_PRELOAD 
 
 echo "\
-
-[pine64-mainline]
-SigLevel = Never
-Server = https://github.com/anarsoul/PKGBUILDs/releases/download/mainline/
-" >> /etc/pacman.conf
-sed -i '/CheckSpace/s/^#[[:space:]]*//g' /etc/pacman.conf
-
-echo "\
 kernel.sysrq = 0
 " > /etc/sysctl.d/sysrq.conf
 
@@ -29,13 +21,15 @@ exit
 " > /opt/first_boot.sh
 chmod +x /opt/first_boot.sh
 
+rm /boot/boot.scr
+
 pacman-key --init
 pacman-key --populate archlinuxarm
 killall -KILL gpg-agent
 pacman -Syu --noconfirm
 pacman -Rsn --noconfirm linux-aarch64
 pacman -Syu --noconfirm --needed zsh dosfstools curl xz netctl dialog \
-	pv linux-pine64 linux-pine64-headers uboot-pine64-git filesystem \
+	pv filesystem uboot-rock64 \
     autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff \
     gzip libtool m4 make patch pkgconf sed sudo texinfo util-linux which docker cmake \
     git llvm clang bc unzip rsync wget curl vim cpio bison flex python gdb valgrind tmux \

@@ -31,7 +31,7 @@ truncate -s $IMAGE_SIZE $IMAGE_NAME
 echo "Creating filesystems"
 
 parted --script $IMAGE_NAME mklabel msdos
-parted --script $IMAGE_NAME mkpart primary ext4 1MiB 100%
+parted --script -a optimal $IMAGE_NAME mkpart primary ext4 32768 100%
 parted --script $IMAGE_NAME "set" 1 boot on
 
 echo "Attaching loop device"
@@ -73,9 +73,24 @@ else
     wget $ROOTFS_URL || (echo "cannot download image" && exit 1)
     # Extract with BSD tar
     echo -n "Extracting ... "
-    bsdtar -xpf "$(basename ${ROOTFS_URL})" -C "$TEMP_ROOT"
+    bsdtar -xpf "$(basename ${ROOTFS_URL})" -C "${TEMP_ROOT}"
     echo "OK"
 fi
+
+echo "placing boot.scr @ /boot"
+wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/boot.scr -O ${TEMP_ROOT}/boot/boot.scr
+
+echo "Setting up idbloader"
+wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/idbloader.img
+dd if=idbloader.img of=/dev/sdX seek=64 conv=notrunc
+
+echo "Setting up uboot"
+wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/uboot.img
+dd if=uboot.img of=/dev/sdX seek=16384 conv=notrunc
+
+echo "Setting up trust"
+wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/trust.img
+dd if=trust.img of=/dev/sdX seek=24576 conv=notrunc
 
 echo "Mounting system partitions for chrooting"
 mv ${TEMP_ROOT}/etc/resolv.conf ${TEMP_ROOT}/etc/resolv.conf.bckup
@@ -89,10 +104,6 @@ rm -f ${TEMP_ROOT}/opt/second_phase.sh
 rm -f ${TEMP_ROOT}/usr/bin/qemu-*
 rm -f ${TEMP_ROOT}/etc/resolv.conf
 mv ${TEMP_ROOT}/etc/resolv.conf.bckup ${TEMP_ROOT}/etc/resolv.conf 
-
-
-echo "Installing bootloader"
-dd if=${TEMP_ROOT}/boot/u-boot-sunxi-with-spl-sopine.bin of=${LOOP_DEVICE} bs=8k seek=1
 
 umount ${TEMP_ROOT}
 losetup -d $LOOP_DEVICE
