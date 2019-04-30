@@ -28,8 +28,12 @@ fi
 # build the empty image
 truncate -s $IMAGE_SIZE $IMAGE_NAME
 
+echo "Attaching loop device"
+LOOP_DEVICE=$(losetup -f)
+losetup $LOOP_DEVICE $IMAGE_NAME
+
 # zero the beginning of the image
-dd if=/dev/zero of=$IMAGE_NAME bs=1M count=32
+dd if=/dev/zero of=$LOOP_DEVICE bs=1M count=32
 
 echo "Creating filesystems"
 (
@@ -41,23 +45,19 @@ echo 32768
 echo   # Last sector (Accept default: varies)
 echo p # print layout
 echo w # Write changes
-) | sudo fdisk $IMAGE_NAME
+) | sudo fdisk $LOOP_DEVICE
 
 echo "Setting up idbloader"
 wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/idbloader.img
-dd if=idbloader.img of=$IMAGE_NAME seek=64 conv=notrunc
+dd if=idbloader.img of=$LOOP_DEVICE seek=64 conv=notrunc
 
 echo "Setting up uboot"
 wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/uboot.img
-dd if=uboot.img of=$IMAGE_NAME seek=16384 conv=notrunc
+dd if=uboot.img of=$LOOP_DEVICE seek=16384 conv=notrunc
 
 echo "Setting up trust"
 wget http://os.archlinuxarm.org/os/rockchip/boot/rock64/trust.img
-dd if=trust.img of=$IMAGE_NAME seek=24576 conv=notrunc
-
-echo "Attaching loop device"
-LOOP_DEVICE=$(losetup -f)
-losetup -P $LOOP_DEVICE $IMAGE_NAME
+dd if=trust.img of=$LOOP_DEVICE seek=24576 conv=notrunc
 
 mkfs.ext4 -L root ${LOOP_DEVICE}p1
 
