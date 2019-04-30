@@ -29,10 +29,16 @@ fi
 truncate -s $IMAGE_SIZE $IMAGE_NAME
 
 echo "Creating filesystems"
-
-parted --script $IMAGE_NAME mklabel msdos
-parted --script -a optimal $IMAGE_NAME mkpart primary ext4 32768 100%
-parted --script $IMAGE_NAME "set" 1 boot on
+(
+echo o # Create a new empty DOS partition table
+echo n # Add a new partition
+echo p # Primary partition
+echo 1 # Partition number
+echo 32768
+echo   # Last sector (Accept default: varies)
+echo p # print layout
+echo w # Write changes
+) | sudo fdisk $IMAGE_NAME
 
 echo "Attaching loop device"
 LOOP_DEVICE=$(losetup -f)

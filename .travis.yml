@@ -22,3 +22,6 @@ deploy:
   file: aarch64_headless.img.xz
   on:
     repo: jeanlego/pine64
+    branches:
+      only:
+        - mainline

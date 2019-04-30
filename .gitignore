@@ -1,4 +1,6 @@
 build/
 *.img
 *.xz
+*.gz.*
 *.gz
+ArchLinuxARM-aarch64-latest
