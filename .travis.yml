@@ -14,12 +14,21 @@ before_script:
 script:
 - sudo ./build_image.sh
 - sudo xz -k -v -1 --compress -T 2 aarch64_headless.img
+
+before_deploy:
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - export GIT_TAG=$TRAVIS_BRANCH-0.1.$TRAVIS_BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+  - git push -q https://$TAGPERM@github.com/jeanlego/pine64 --tags
+  - ls -R
+
 deploy:
   provider: releases
   api_key:
     secure: FRALRjlxwwDUvYrO1tLCK00vaDfqVfx40IhVHyBpTKpcasN/+LUFBlZbjyVX/+UzgTpcF3XVy5ky8Rizg66MNB2EZbNQ0ydRIscehQnLxHQgl8/kKJoTMMkWVBicIoepSylKmIgXrO0wqJiHNwGSSFhEsPaDX52DvF4l1wBPYUlJGb+V7Mric4lpYbMRTPaMBCDXwRY2eN981stmexEJ8MebUny2BgrNoHBmNgMSjlVHaVwF54gNQ1JznhPqcVplIUwxn4xZMfgc8VNdNjiD5K5djt7lhQNa29grorQ5vj5nqEw8Z3en5gJh1AiPu5Rg//WhPZ0/VzaRWi5dQg40Uv59NTe+88968Rz8phM4ZNvY3TqCyf+XpmtqZh/WprRG5a7NdJN8oBw1KjwqXN2HCOiq0axnOGPInigXJlZlnuwJTzBmJfcCJJa1BI1sn78dC23eFm13m8Fg3czKXnV/AapXUM7KPu3UadDZi7soq11xmnMfBCotAVYVXadI0sb+WgrIG5kZDinELDHLh03PvybgyPeJydMnPa0tt43PpQyz9LNQjZjWe6AtX/2qXS7eMZDYxpzXTaF6dVX1r6oC6sBTKEMXTM/08p9gybkIeMjWI4vkY+8XYXqUh61HqdJVb6+3B1+mnVzSNprz7UtYs56ZWVYHI4MHMGjd1iEZxc8=
-  file: aarch64_headless.img.xz
+  file: aarch64_headless.img.xz  
+  skip_cleanup: true
   on:
-    repo: jeanlego/pine64
     all-branches: true
-    tags: true
+    tags: false
